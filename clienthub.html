@@ -1,0 +1,2386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Client Hub | Vaishnavi Web Development</title>
+
+    <meta
+        name="description"
+        content="Client Hub — Manage websites, projects, payment status and project details."
+    >
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Font Awesome -->
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    >
+
+    <!-- Google Font -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+        rel="stylesheet"
+    >
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ["Inter", "sans-serif"],
+                        display: ["Space Grotesk", "sans-serif"]
+                    },
+
+                    colors: {
+                        brand: "#0ea5e9",
+                        navy: "#080d1c"
+                    },
+
+                    boxShadow: {
+                        glow: "0 0 40px rgba(14,165,233,.12)"
+                    }
+                }
+            }
+        };
+    </script>
+
+    <style>
+
+        * {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background:
+                radial-gradient(
+                    circle at 20% 10%,
+                    rgba(14, 165, 233, .08),
+                    transparent 30%
+                ),
+                radial-gradient(
+                    circle at 90% 80%,
+                    rgba(99, 102, 241, .08),
+                    transparent 30%
+                ),
+                #030712;
+
+            color: #f8fafc;
+        }
+
+
+        /* --------------------------------
+           BACKGROUND GRID
+        -------------------------------- */
+
+        .grid-bg {
+
+            background-image:
+                linear-gradient(
+                    rgba(255,255,255,.025) 1px,
+                    transparent 1px
+                ),
+                linear-gradient(
+                    90deg,
+                    rgba(255,255,255,.025) 1px,
+                    transparent 1px
+                );
+
+            background-size: 50px 50px;
+        }
+
+
+        /* --------------------------------
+           CARD
+        -------------------------------- */
+
+        .client-card {
+
+            transform-style: preserve-3d;
+
+            transition:
+                transform .45s cubic-bezier(.2,.8,.2,1),
+                border-color .3s ease,
+                box-shadow .3s ease;
+        }
+
+
+        .client-card:hover {
+
+            transform:
+                translateY(-10px)
+                rotateX(2deg)
+                rotateY(-2deg);
+
+            border-color:
+                rgba(14,165,233,.55);
+
+            box-shadow:
+                0 25px 70px rgba(0,0,0,.45),
+                0 0 40px rgba(14,165,233,.08);
+        }
+
+
+        .client-image {
+
+            transition:
+                transform .7s cubic-bezier(.2,.8,.2,1),
+                filter .4s ease;
+        }
+
+
+        .client-card:hover .client-image {
+
+            transform: scale(1.08);
+
+            filter:
+                brightness(.8)
+                saturate(1.15);
+        }
+
+
+        /* --------------------------------
+           GLASS
+        -------------------------------- */
+
+        .glass {
+
+            background:
+                rgba(15,23,42,.72);
+
+            backdrop-filter:
+                blur(18px);
+
+            -webkit-backdrop-filter:
+                blur(18px);
+
+            border:
+                1px solid rgba(148,163,184,.14);
+        }
+
+
+        /* --------------------------------
+           FILTER BUTTON
+        -------------------------------- */
+
+        .filter-btn {
+
+            transition:
+                all .3s ease;
+        }
+
+
+        .filter-btn:hover {
+
+            transform: translateY(-2px);
+
+            background:
+                rgba(30,41,59,.9);
+        }
+
+
+        .filter-btn.active {
+
+            background:
+                #0ea5e9;
+
+            color:
+                white;
+
+            border-color:
+                #0ea5e9;
+
+            box-shadow:
+                0 10px 30px rgba(14,165,233,.22);
+        }
+
+
+        /* --------------------------------
+           STATUS
+        -------------------------------- */
+
+        .paid {
+
+            color: #4ade80;
+
+            background:
+                rgba(34,197,94,.12);
+
+            border:
+                1px solid rgba(34,197,94,.2);
+        }
+
+
+        .unpaid {
+
+            color: #fb7185;
+
+            background:
+                rgba(244,63,94,.12);
+
+            border:
+                1px solid rgba(244,63,94,.2);
+        }
+
+
+        /* --------------------------------
+           LOCK
+        -------------------------------- */
+
+        .lock-icon {
+
+            transition:
+                transform .3s ease,
+                color .3s ease;
+        }
+
+
+        .client-card:hover .lock-icon {
+
+            transform:
+                translateY(-3px)
+                rotate(-8deg);
+
+            color:
+                #38bdf8;
+        }
+
+
+        /* --------------------------------
+           REVEAL
+        -------------------------------- */
+
+        .reveal {
+
+            opacity: 0;
+
+            transform:
+                translateY(30px);
+
+            animation:
+                reveal .7s ease forwards;
+        }
+
+
+        @keyframes reveal {
+
+            to {
+
+                opacity: 1;
+
+                transform:
+                    translateY(0);
+            }
+        }
+
+
+        /* --------------------------------
+           FLOAT
+        -------------------------------- */
+
+        .floating {
+
+            animation:
+                floating 5s ease-in-out infinite;
+        }
+
+
+        @keyframes floating {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-8px);
+            }
+        }
+
+
+        /* --------------------------------
+           MODAL
+        -------------------------------- */
+
+        #passcodeModal {
+
+            opacity: 0;
+
+            pointer-events: none;
+
+            transition:
+                opacity .3s ease;
+        }
+
+
+        #passcodeModal.show {
+
+            opacity: 1;
+
+            pointer-events: auto;
+        }
+
+
+        #modalBox {
+
+            transform:
+                translateY(30px)
+                scale(.95);
+
+            transition:
+                transform .35s ease;
+        }
+
+
+        #passcodeModal.show #modalBox {
+
+            transform:
+                translateY(0)
+                scale(1);
+        }
+
+
+        /* --------------------------------
+           INPUT
+        -------------------------------- */
+
+        .pass-input {
+
+            letter-spacing:
+                .35em;
+
+            text-align:
+                center;
+        }
+
+
+        /* --------------------------------
+           MOBILE
+        -------------------------------- */
+
+        @media(max-width:640px) {
+
+            .hero-title {
+
+                font-size:
+                    2.7rem;
+
+                line-height:
+                    1;
+            }
+
+            .search-box {
+
+                width:
+                    100%;
+            }
+        }
+
+    </style>
+
+</head>
+
+
+<body class="min-h-screen grid-bg">
+
+
+<!-- =========================================================
+     HEADER
+========================================================= -->
+
+<header
+    class="
+        sticky
+        top-0
+        z-50
+        border-b
+        border-slate-800/80
+        bg-[#070b18]/90
+        backdrop-blur-xl
+    "
+>
+
+    <div
+        class="
+            max-w-7xl
+            mx-auto
+            px-5
+            lg:px-8
+            h-20
+            flex
+            items-center
+            justify-between
+        "
+    >
+
+        <!-- BACK -->
+
+        <a
+            href="index.html"
+            class="
+                flex
+                items-center
+                gap-3
+                text-slate-400
+                hover:text-white
+                transition
+            "
+        >
+
+            <span
+                class="
+                    w-10
+                    h-10
+                    rounded-xl
+                    bg-slate-800
+                    flex
+                    items-center
+                    justify-center
+                "
+            >
+
+                <i class="fa-solid fa-arrow-left"></i>
+
+            </span>
+
+            <span class="hidden sm:block font-medium">
+                Back to Home
+            </span>
+
+        </a>
+
+
+        <!-- BRAND -->
+
+        <div
+            class="
+                absolute
+                left-1/2
+                -translate-x-1/2
+                flex
+                items-center
+                gap-3
+            "
+        >
+
+            <div
+                class="
+                    w-11
+                    h-11
+                    rounded-xl
+                    bg-sky-500/15
+                    border
+                    border-sky-400/20
+                    flex
+                    items-center
+                    justify-center
+                    text-sky-400
+                    font-bold
+                    text-xl
+                "
+            >
+                V
+            </div>
+
+            <div class="hidden sm:block">
+
+                <p
+                    class="
+                        font-display
+                        font-bold
+                        text-lg
+                    "
+                >
+                    Client Hub
+                </p>
+
+                <p
+                    class="
+                        text-[10px]
+                        uppercase
+                        tracking-[.2em]
+                        text-slate-500
+                    "
+                >
+                    Vaishnavi Web
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- RIGHT -->
+
+        <a
+            href="#"
+            class="
+                w-10
+                h-10
+                rounded-xl
+                bg-slate-800
+                flex
+                items-center
+                justify-center
+                text-slate-400
+                hover:text-sky-400
+                hover:bg-slate-700
+                transition
+            "
+            title="Help"
+        >
+
+            <i class="fa-solid fa-circle-question"></i>
+
+        </a>
+
+    </div>
+
+</header>
+
+
+
+<!-- =========================================================
+     HERO
+========================================================= -->
+
+<main>
+
+<section
+    class="
+        max-w-7xl
+        mx-auto
+        px-5
+        lg:px-8
+        pt-20
+        pb-10
+    "
+>
+
+    <div class="text-center max-w-3xl mx-auto">
+
+
+        <!-- BADGE -->
+
+        <div
+            class="
+                inline-flex
+                items-center
+                gap-2
+                px-4
+                py-2
+                rounded-full
+                border
+                border-sky-400/20
+                bg-sky-400/5
+                text-sky-400
+                text-sm
+                floating
+            "
+        >
+
+            <i class="fa-solid fa-globe"></i>
+
+            Client Portal
+
+        </div>
+
+
+        <!-- TITLE -->
+
+        <h1
+            class="
+                hero-title
+                mt-7
+                text-5xl
+                md:text-6xl
+                lg:text-7xl
+                font-display
+                font-bold
+                tracking-tight
+            "
+        >
+
+            Your
+            <span
+                class="
+                    text-transparent
+                    bg-clip-text
+                    bg-gradient-to-r
+                    from-sky-400
+                    via-cyan-300
+                    to-indigo-400
+                "
+            >
+                Websites
+            </span>
+
+        </h1>
+
+
+        <p
+            class="
+                mt-6
+                text-slate-400
+                text-base
+                md:text-lg
+                leading-relaxed
+            "
+        >
+
+            Select your website and enter your passcode
+            to view project details, payment status,
+            website information and analytics.
+
+        </p>
+
+
+        <!-- SMALL STATS -->
+
+        <div
+            class="
+                mt-8
+                flex
+                justify-center
+                gap-3
+                flex-wrap
+            "
+        >
+
+            <div
+                class="
+                    glass
+                    rounded-xl
+                    px-4
+                    py-3
+                    text-sm
+                "
+            >
+
+                <span class="text-sky-400 font-bold">
+                    50+
+                </span>
+
+                <span class="text-slate-500 ml-1">
+                    Projects
+                </span>
+
+            </div>
+
+
+            <div
+                class="
+                    glass
+                    rounded-xl
+                    px-4
+                    py-3
+                    text-sm
+                "
+            >
+
+                <span class="text-green-400 font-bold">
+                    All
+                </span>
+
+                <span class="text-slate-500 ml-1">
+                    Paid
+                </span>
+
+            </div>
+
+
+            <div
+                class="
+                    glass
+                    rounded-xl
+                    px-4
+                    py-3
+                    text-sm
+                "
+            >
+
+                <span class="text-blue-400 font-bold">
+                    24/7
+                </span>
+
+                <span class="text-slate-500 ml-1">
+                    Access
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =====================================================
+         SEARCH + FILTER
+    ====================================================== -->
+
+    <div
+        class="
+            mt-14
+            flex
+            flex-col
+            xl:flex-row
+            gap-4
+            xl:items-center
+        "
+    >
+
+        <!-- SEARCH -->
+
+        <div
+            class="
+                search-box
+                relative
+                flex-1
+            "
+        >
+
+            <i
+                class="
+                    fa-solid
+                    fa-magnifying-glass
+                    absolute
+                    left-5
+                    top-1/2
+                    -translate-y-1/2
+                    text-slate-400
+                "
+            ></i>
+
+            <input
+                id="searchInput"
+                type="text"
+                placeholder="Search by client name or project..."
+                class="
+                    w-full
+                    h-14
+                    rounded-2xl
+                    border
+                    border-slate-700
+                    bg-slate-900/80
+                    pl-13
+                    pr-5
+                    text-white
+                    outline-none
+                    focus:border-sky-400
+                    focus:ring-4
+                    focus:ring-sky-400/10
+                    transition
+                "
+            >
+
+        </div>
+
+
+        <!-- FILTERS -->
+
+        <div
+            class="
+                flex
+                gap-2
+                overflow-x-auto
+                pb-1
+            "
+        >
+
+            <button
+                class="filter-btn active whitespace-nowrap px-5 py-3 rounded-xl border border-slate-700 text-sm font-medium"
+                data-filter="all"
+            >
+                All
+            </button>
+
+            <button
+                class="filter-btn whitespace-nowrap px-5 py-3 rounded-xl border border-slate-700 bg-slate-800/70 text-slate-300 text-sm font-medium"
+                data-filter="Business"
+            >
+                Business
+            </button>
+
+            <button
+                class="filter-btn whitespace-nowrap px-5 py-3 rounded-xl border border-slate-700 bg-slate-800/70 text-slate-300 text-sm font-medium"
+                data-filter="Interior"
+            >
+                Interior
+            </button>
+
+            <button
+                class="filter-btn whitespace-nowrap px-5 py-3 rounded-xl border border-slate-700 bg-slate-800/70 text-slate-300 text-sm font-medium"
+                data-filter="Agro"
+            >
+                Agro
+            </button>
+
+            <button
+                class="filter-btn whitespace-nowrap px-5 py-3 rounded-xl border border-slate-700 bg-slate-800/70 text-slate-300 text-sm font-medium"
+                data-filter="ISP"
+            >
+                ISP
+            </button>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =====================================================
+         CLIENT GRID
+    ====================================================== -->
+
+    <div
+        id="clientGrid"
+        class="
+            mt-8
+            grid
+            sm:grid-cols-2
+            lg:grid-cols-3
+            gap-6
+        "
+    >
+
+
+        <!-- =================================================
+             SHANTI STORES
+        ================================================== -->
+
+        <article
+            class="
+                client-card
+                client-item
+                glass
+                rounded-3xl
+                overflow-hidden
+                reveal
+            "
+            data-category="Business"
+            data-name="Shanti Stores"
+            style="animation-delay:.05s"
+        >
+
+            <div class="relative h-56 overflow-hidden">
+
+                <img
+                    src="images/clients/shanti-stores.jpg"
+                    alt="Shanti Stores website"
+                    class="
+                        client-image
+                        w-full
+                        h-full
+                        object-cover
+                    "
+                >
+
+                <div
+                    class="
+                        absolute
+                        inset-0
+                        bg-gradient-to-t
+                        from-[#080d1c]
+                        via-transparent
+                        to-black/20
+                    "
+                ></div>
+
+
+                <!-- CATEGORY -->
+
+                <span
+                    class="
+                        absolute
+                        top-4
+                        left-4
+                        px-3
+                        py-1.5
+                        rounded-full
+                        bg-black/40
+                        backdrop-blur-md
+                        text-xs
+                        font-medium
+                    "
+                >
+                    Business
+                </span>
+
+
+                <!-- STATUS -->
+
+                <span
+                    class="
+                        paid
+                        absolute
+                        top-4
+                        right-4
+                        px-3
+                        py-1.5
+                        rounded-full
+                        text-xs
+                        font-semibold
+                    "
+                >
+
+                    <i class="fa-solid fa-circle-check mr-1"></i>
+                    Paid
+
+                </span>
+
+            </div>
+
+
+            <div class="p-5">
+
+                <div
+                    class="
+                        flex
+                        items-start
+                        justify-between
+                        gap-4
+                    "
+                >
+
+                    <div>
+
+                        <h2
+                            class="
+                                text-xl
+                                font-bold
+                            "
+                        >
+                            Shanti Stores
+                        </h2>
+
+                        <p
+                            class="
+                                text-sm
+                                text-slate-500
+                                mt-1
+                            "
+                        >
+                            Business Website
+                        </p>
+
+                    </div>
+
+
+                    <i
+                        class="
+                            lock-icon
+                            fa-solid
+                            fa-lock
+                            text-slate-500
+                        "
+                    ></i>
+
+                </div>
+
+
+                <div
+                    class="
+                        flex
+                        items-center
+                        justify-between
+                        mt-5
+                        pt-5
+                        border-t
+                        border-slate-800
+                    "
+                >
+
+                    <span
+                        class="
+                            text-xs
+                            text-slate-500
+                        "
+                    >
+                        Website Portal
+                    </span>
+
+                    <button
+                        onclick="openPasscode('Shanti Stores')"
+                        class="
+                            text-sm
+                            font-semibold
+                            text-sky-400
+                            hover:text-sky-300
+                            transition
+                        "
+                    >
+
+                        View Details
+
+                        <i
+                            class="
+                                fa-solid
+                                fa-arrow-right
+                                ml-1
+                            "
+                        ></i>
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </article>
+
+
+
+        <!-- =================================================
+             RAJESH INTERIOR
+        ================================================== -->
+
+        <article
+            class="
+                client-card
+                client-item
+                glass
+                rounded-3xl
+                overflow-hidden
+                reveal
+            "
+            data-category="Interior"
+            data-name="Rajesh Interior"
+            style="animation-delay:.1s"
+        >
+
+            <div class="relative h-56 overflow-hidden">
+
+                <img
+                    src="images/clients/rajesh-interior.jpg"
+                    alt="Rajesh Interior website"
+                    class="client-image w-full h-full object-cover"
+                >
+
+                <div
+                    class="
+                        absolute
+                        inset-0
+                        bg-gradient-to-t
+                        from-[#080d1c]
+                        via-transparent
+                    "
+                ></div>
+
+                <span
+                    class="
+                        absolute
+                        top-4
+                        left-4
+                        px-3
+                        py-1.5
+                        rounded-full
+                        bg-black/40
+                        backdrop-blur-md
+                        text-xs
+                    "
+                >
+                    Interior
+                </span>
+
+                <span
+                    class="
+                        paid
+                        absolute
+                        top-4
+                        right-4
+                        px-3
+                        py-1.5
+                        rounded-full
+                        text-xs
+                        font-semibold
+                    "
+                >
+                    <i class="fa-solid fa-circle-check mr-1"></i>
+                    Paid
+                </span>
+
+            </div>
+
+
+            <div class="p-5">
+
+                <div class="flex justify-between gap-4">
+
+                    <div>
+
+                        <h2 class="text-xl font-bold">
+                            Rajesh Interior
+                        </h2>
+
+                        <p class="text-sm text-slate-500 mt-1">
+                            Interior Design Website
+                        </p>
+
+                    </div>
+
+                    <i
+                        class="
+                            lock-icon
+                            fa-solid
+                            fa-lock
+                            text-slate-500
+                        "
+                    ></i>
+
+                </div>
+
+
+                <div
+                    class="
+                        mt-5
+                        pt-5
+                        border-t
+                        border-slate-800
+                        flex
+                        justify-between
+                        items-center
+                    "
+                >
+
+                    <span class="text-xs text-slate-500">
+                        Project Portal
+                    </span>
+
+                    <button
+                        onclick="openPasscode('Rajesh Interior')"
+                        class="
+                            text-sm
+                            font-semibold
+                            text-sky-400
+                        "
+                    >
+
+                        View Details
+                        <i class="fa-solid fa-arrow-right ml-1"></i>
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </article>
+
+
+
+        <!-- =================================================
+             AAS AGRO
+        ================================================== -->
+
+        <article
+            class="
+                client-card
+                client-item
+                glass
+                rounded-3xl
+                overflow-hidden
+                reveal
+            "
+            data-category="Agro"
+            data-name="AAS Agro Products"
+            style="animation-delay:.15s"
+        >
+
+            <div class="relative h-56 overflow-hidden">
+
+                <img
+                    src="images/clients/aas-agro.jpg"
+                    alt="AAS Agro Products website"
+                    class="client-image w-full h-full object-cover"
+                >
+
+                <div
+                    class="
+                        absolute
+                        inset-0
+                        bg-gradient-to-t
+                        from-[#080d1c]
+                        via-transparent
+                    "
+                ></div>
+
+                <span
+                    class="
+                        absolute
+                        top-4
+                        left-4
+                        px-3
+                        py-1.5
+                        rounded-full
+                        bg-black/40
+                        backdrop-blur-md
+                        text-xs
+                    "
+                >
+                    Agro
+                </span>
+
+                <span
+                    class="
+                        paid
+                        absolute
+                        top-4
+                        right-4
+                        px-3
+                        py-1.5
+                        rounded-full
+                        text-xs
+                        font-semibold
+                    "
+                >
+                    <i class="fa-solid fa-circle-check mr-1"></i>
+                    Paid
+                </span>
+
+            </div>
+
+
+            <div class="p-5">
+
+                <div class="flex justify-between">
+
+                    <div>
+
+                        <h2 class="text-xl font-bold">
+                            AAS Agro Products
+                        </h2>
+
+                        <p class="text-sm text-slate-500 mt-1">
+                            Agriculture Business Website
+                        </p>
+
+                    </div>
+
+                    <i
+                        class="
+                            lock-icon
+                            fa-solid
+                            fa-lock
+                            text-slate-500
+                        "
+                    ></i>
+
+                </div>
+
+
+                <div
+                    class="
+                        mt-5
+                        pt-5
+                        border-t
+                        border-slate-800
+                        flex
+                        justify-between
+                    "
+                >
+
+                    <span class="text-xs text-slate-500">
+                        Project Portal
+                    </span>
+
+                    <button
+                        onclick="openPasscode('AAS Agro Products')"
+                        class="
+                            text-sm
+                            font-semibold
+                            text-sky-400
+                        "
+                    >
+
+                        View Details
+                        <i class="fa-solid fa-arrow-right ml-1"></i>
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </article>
+
+
+
+        <!-- =================================================
+             MSN
+        ================================================== -->
+
+        <article
+            class="
+                client-card
+                client-item
+                glass
+                rounded-3xl
+                overflow-hidden
+                reveal
+            "
+            data-category="Business"
+            data-name="MSN & Company"
+            style="animation-delay:.2s"
+        >
+
+            <div class="relative h-56 overflow-hidden">
+
+                <img
+                    src="images/clients/msn-company.jpg"
+                    alt="MSN and Company website"
+                    class="client-image w-full h-full object-cover"
+                >
+
+                <div
+                    class="
+                        absolute
+                        inset-0
+                        bg-gradient-to-t
+                        from-[#080d1c]
+                        via-transparent
+                    "
+                ></div>
+
+                <span
+                    class="
+                        absolute
+                        top-4
+                        left-4
+                        px-3
+                        py-1.5
+                        rounded-full
+                        bg-black/40
+                        backdrop-blur-md
+                        text-xs
+                    "
+                >
+                    Business
+                </span>
+
+                <span
+                    class="
+                        paid
+                        absolute
+                        top-4
+                        right-4
+                        px-3
+                        py-1.5
+                        rounded-full
+                        text-xs
+                    "
+                >
+                    <i class="fa-solid fa-circle-check mr-1"></i>
+                    Paid
+                </span>
+
+            </div>
+
+
+            <div class="p-5">
+
+                <div class="flex justify-between">
+
+                    <div>
+
+                        <h2 class="text-xl font-bold">
+                            MSN & Company
+                        </h2>
+
+                        <p class="text-sm text-slate-500 mt-1">
+                            Corporate Website
+                        </p>
+
+                    </div>
+
+                    <i
+                        class="
+                            lock-icon
+                            fa-solid
+                            fa-lock
+                            text-slate-500
+                        "
+                    ></i>
+
+                </div>
+
+
+                <div
+                    class="
+                        mt-5
+                        pt-5
+                        border-t
+                        border-slate-800
+                        flex
+                        justify-between
+                    "
+                >
+
+                    <span class="text-xs text-slate-500">
+                        Project Portal
+                    </span>
+
+                    <button
+                        onclick="openPasscode('MSN & Company')"
+                        class="text-sm font-semibold text-sky-400"
+                    >
+
+                        View Details
+                        <i class="fa-solid fa-arrow-right ml-1"></i>
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </article>
+
+
+
+        <!-- =================================================
+             HITANSHI
+        ================================================== -->
+
+        <article
+            class="
+                client-card
+                client-item
+                glass
+                rounded-3xl
+                overflow-hidden
+                reveal
+            "
+            data-category="ISP"
+            data-name="Hitanshi Internet Service Provider"
+            style="animation-delay:.25s"
+        >
+
+            <div class="relative h-56 overflow-hidden">
+
+                <img
+                    src="images/clients/hitanshi.jpg"
+                    alt="Hitanshi Internet Service Provider website"
+                    class="client-image w-full h-full object-cover"
+                >
+
+                <div
+                    class="
+                        absolute
+                        inset-0
+                        bg-gradient-to-t
+                        from-[#080d1c]
+                        via-transparent
+                    "
+                ></div>
+
+                <span
+                    class="
+                        absolute
+                        top-4
+                        left-4
+                        px-3
+                        py-1.5
+                        rounded-full
+                        bg-black/40
+                        backdrop-blur-md
+                        text-xs
+                    "
+                >
+                    ISP
+                </span>
+
+                <span
+                    class="
+                        paid
+                        absolute
+                        top-4
+                        right-4
+                        px-3
+                        py-1.5
+                        rounded-full
+                        text-xs
+                    "
+                >
+                    <i class="fa-solid fa-circle-check mr-1"></i>
+                    Paid
+                </span>
+
+            </div>
+
+
+            <div class="p-5">
+
+                <div class="flex justify-between">
+
+                    <div>
+
+                        <h2 class="text-xl font-bold">
+                            Hitanshi ISP
+                        </h2>
+
+                        <p class="text-sm text-slate-500 mt-1">
+                            Internet Service Provider
+                        </p>
+
+                    </div>
+
+                    <i
+                        class="
+                            lock-icon
+                            fa-solid
+                            fa-lock
+                            text-slate-500
+                        "
+                    ></i>
+
+                </div>
+
+
+                <div
+                    class="
+                        mt-5
+                        pt-5
+                        border-t
+                        border-slate-800
+                        flex
+                        justify-between
+                    "
+                >
+
+                    <span class="text-xs text-slate-500">
+                        Project Portal
+                    </span>
+
+                    <button
+                        onclick="openPasscode('Hitanshi ISP')"
+                        class="text-sm font-semibold text-sky-400"
+                    >
+
+                        View Details
+                        <i class="fa-solid fa-arrow-right ml-1"></i>
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </article>
+
+
+
+        <!-- =================================================
+             ROOPCRAFT
+        ================================================== -->
+
+        <article
+            class="
+                client-card
+                client-item
+                glass
+                rounded-3xl
+                overflow-hidden
+                reveal
+            "
+            data-category="Interior"
+            data-name="Roopcraft Living"
+            style="animation-delay:.3s"
+        >
+
+            <div class="relative h-56 overflow-hidden">
+
+                <img
+                    src="images/clients/roopcraft.jpg"
+                    alt="Roopcraft Living website"
+                    class="client-image w-full h-full object-cover"
+                >
+
+                <div
+                    class="
+                        absolute
+                        inset-0
+                        bg-gradient-to-t
+                        from-[#080d1c]
+                        via-transparent
+                    "
+                ></div>
+
+                <span
+                    class="
+                        absolute
+                        top-4
+                        left-4
+                        px-3
+                        py-1.5
+                        rounded-full
+                        bg-black/40
+                        backdrop-blur-md
+                        text-xs
+                    "
+                >
+                    Interior
+                </span>
+
+                <span
+                    class="
+                        unpaid
+                        absolute
+                        top-4
+                        right-4
+                        px-3
+                        py-1.5
+                        rounded-full
+                        text-xs
+                        font-semibold
+                    "
+                >
+                    <i class="fa-solid fa-circle-xmark mr-1"></i>
+                    Unpaid
+                </span>
+
+            </div>
+
+
+            <div class="p-5">
+
+                <div class="flex justify-between">
+
+                    <div>
+
+                        <h2 class="text-xl font-bold">
+                            Roopcraft Living
+                        </h2>
+
+                        <p class="text-sm text-slate-500 mt-1">
+                            Luxury Architecture Website
+                        </p>
+
+                    </div>
+
+                    <i
+                        class="
+                            lock-icon
+                            fa-solid
+                            fa-lock
+                            text-slate-500
+                        "
+                    ></i>
+
+                </div>
+
+
+                <div
+                    class="
+                        mt-5
+                        pt-5
+                        border-t
+                        border-slate-800
+                        flex
+                        justify-between
+                    "
+                >
+
+                    <span class="text-xs text-slate-500">
+                        Project Portal
+                    </span>
+
+                    <button
+                        onclick="openPasscode('Roopcraft Living')"
+                        class="text-sm font-semibold text-sky-400"
+                    >
+
+                        View Details
+                        <i class="fa-solid fa-arrow-right ml-1"></i>
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </article>
+
+
+    </div>
+
+
+    <!-- EMPTY RESULT -->
+
+    <div
+        id="noResults"
+        class="
+            hidden
+            text-center
+            py-20
+        "
+    >
+
+        <div
+            class="
+                w-16
+                h-16
+                rounded-2xl
+                bg-slate-800
+                mx-auto
+                flex
+                items-center
+                justify-center
+                text-slate-500
+                text-2xl
+            "
+        >
+
+            <i class="fa-solid fa-folder-open"></i>
+
+        </div>
+
+        <h3
+            class="
+                mt-5
+                text-xl
+                font-bold
+            "
+        >
+            No projects found
+        </h3>
+
+        <p class="text-slate-500 mt-2">
+            Try another client name or category.
+        </p>
+
+    </div>
+
+</section>
+
+</main>
+
+
+
+<!-- =========================================================
+     PASSCODE MODAL
+========================================================= -->
+
+<div
+    id="passcodeModal"
+    class="
+        fixed
+        inset-0
+        z-[100]
+        bg-black/80
+        backdrop-blur-md
+        flex
+        items-center
+        justify-center
+        p-5
+    "
+>
+
+    <div
+        id="modalBox"
+        class="
+            glass
+            rounded-3xl
+            p-7
+            w-full
+            max-w-md
+            shadow-2xl
+        "
+    >
+
+        <!-- ICON -->
+
+        <div
+            class="
+                w-16
+                h-16
+                mx-auto
+                rounded-2xl
+                bg-sky-500/10
+                border
+                border-sky-400/20
+                flex
+                items-center
+                justify-center
+                text-sky-400
+                text-2xl
+            "
+        >
+
+            <i class="fa-solid fa-lock"></i>
+
+        </div>
+
+
+        <h2
+            id="modalClientName"
+            class="
+                mt-6
+                text-2xl
+                text-center
+                font-bold
+            "
+        >
+            Client Portal
+        </h2>
+
+
+        <p
+            class="
+                text-center
+                text-slate-500
+                text-sm
+                mt-2
+            "
+        >
+            Enter your private project passcode
+            to continue.
+        </p>
+
+
+        <!-- INPUT -->
+
+        <input
+            id="passcodeInput"
+            type="password"
+            maxlength="6"
+            inputmode="numeric"
+            placeholder="••••••"
+            class="
+                pass-input
+                mt-7
+                w-full
+                h-14
+                rounded-2xl
+                bg-slate-950
+                border
+                border-slate-700
+                text-white
+                text-xl
+                outline-none
+                focus:border-sky-400
+                focus:ring-4
+                focus:ring-sky-400/10
+            "
+        >
+
+
+        <p
+            id="errorMessage"
+            class="
+                hidden
+                text-red-400
+                text-sm
+                text-center
+                mt-3
+            "
+        >
+            Incorrect passcode. Please try again.
+        </p>
+
+
+        <!-- BUTTONS -->
+
+        <div
+            class="
+                grid
+                grid-cols-2
+                gap-3
+                mt-5
+            "
+        >
+
+            <button
+                onclick="closePasscode()"
+                class="
+                    h-12
+                    rounded-xl
+                    bg-slate-800
+                    text-slate-300
+                    font-semibold
+                    hover:bg-slate-700
+                    transition
+                "
+            >
+                Cancel
+            </button>
+
+
+            <button
+                onclick="verifyPasscode()"
+                class="
+                    h-12
+                    rounded-xl
+                    bg-sky-500
+                    text-white
+                    font-semibold
+                    hover:bg-sky-400
+                    hover:-translate-y-0.5
+                    transition
+                    shadow-lg
+                    shadow-sky-500/20
+                "
+            >
+                Continue
+            </button>
+
+        </div>
+
+
+        <p
+            class="
+                text-center
+                text-[11px]
+                text-slate-600
+                mt-5
+            "
+        >
+            🔒 Your project information is private.
+
+        </p>
+
+    </div>
+
+</div>
+
+
+
+<!-- =========================================================
+     FOOTER
+========================================================= -->
+
+<footer
+    class="
+        border-t
+        border-slate-800
+        mt-10
+    "
+>
+
+    <div
+        class="
+            max-w-7xl
+            mx-auto
+            px-5
+            lg:px-8
+            py-8
+            flex
+            flex-col
+            md:flex-row
+            items-center
+            justify-between
+            gap-4
+        "
+    >
+
+        <p
+            class="
+                text-sm
+                text-slate-600
+            "
+        >
+            © 2026 Vaishnavi Web Development.
+            All rights reserved.
+        </p>
+
+
+        <div
+            class="
+                flex
+                items-center
+                gap-5
+            "
+        >
+
+            <a
+                href="https://www.instagram.com/vaishnavi.webdev/"
+                class="
+                    text-slate-500
+                    hover:text-sky-400
+                    transition
+                "
+            >
+                <i class="fa-brands fa-instagram"></i>
+            </a>
+
+            <a
+                href="https://web.whatsapp.com/send?phone=+919027690490"
+                class="
+                    text-slate-500
+                    hover:text-green-400
+                    transition
+                "
+            >
+                <i class="fa-brands fa-whatsapp"></i>
+            </a>
+
+            <a
+                href="https://github.com/va-ishnavi"
+                class="
+                    text-slate-500
+                    hover:text-white
+                    transition
+                "
+            >
+                <i class="fa-brands fa-github"></i>
+            </a>
+
+        </div>
+
+    </div>
+
+</footer>
+
+
+
+<!-- =========================================================
+     JAVASCRIPT
+========================================================= -->
+
+<script>
+
+    /* --------------------------------
+       PASSCODE
+    -------------------------------- */
+
+    let selectedClient = "";
+
+
+    function openPasscode(client) {
+
+        selectedClient = client;
+
+        document
+            .getElementById("modalClientName")
+            .textContent = client;
+
+
+        document
+            .getElementById("passcodeModal")
+            .classList.add("show");
+
+
+        document
+            .getElementById("passcodeInput")
+            .value = "";
+
+
+        document
+            .getElementById("errorMessage")
+            .classList.add("hidden");
+
+
+        setTimeout(() => {
+
+            document
+                .getElementById("passcodeInput")
+                .focus();
+
+        }, 300);
+
+    }
+
+
+
+    function closePasscode() {
+
+        document
+            .getElementById("passcodeModal")
+            .classList.remove("show");
+
+    }
+
+
+
+    function verifyPasscode() {
+
+        const entered =
+            document
+                .getElementById("passcodeInput")
+                .value;
+
+
+        /*
+            DEMO PASSWORD
+
+            Change this later for each client.
+
+            Example:
+            Shanti = 123456
+            Rajesh = 258025
+        */
+
+        const passwords = {
+
+            "Shanti Stores":
+                "123456",
+
+            "Rajesh Interior":
+                "258025",
+
+            "AAS Agro Products":
+                "456789",
+
+            "MSN & Company":
+                "789012",
+
+            "Hitanshi ISP":
+                "321654",
+
+            "Roopcraft Living":
+                "987654"
+
+        };
+
+
+        if (
+            passwords[selectedClient] &&
+            entered === passwords[selectedClient]
+        ) {
+
+            /*
+                Replace this with each
+                client's dashboard URL.
+            */
+
+            const pages = {
+
+                "Shanti Stores":
+                    "clients/shanti.html",
+
+                "Rajesh Interior":
+                    "clients/rajesh.html",
+
+                "AAS Agro Products":
+                    "clients/aas-agro.html",
+
+                "MSN & Company":
+                    "clients/msn.html",
+
+                "Hitanshi ISP":
+                    "clients/hitanshi.html",
+
+                "Roopcraft Living":
+                    "clients/roopcraft.html"
+
+            };
+
+
+            window.location.href =
+                pages[selectedClient];
+
+        }
+
+        else {
+
+            document
+                .getElementById("errorMessage")
+                .classList.remove("hidden");
+
+
+            document
+                .getElementById("passcodeInput")
+                .classList.add(
+                    "border-red-500"
+                );
+
+        }
+
+    }
+
+
+
+    /* --------------------------------
+       SEARCH
+    -------------------------------- */
+
+    const searchInput =
+        document.getElementById("searchInput");
+
+    const cards =
+        document.querySelectorAll(".client-item");
+
+    const noResults =
+        document.getElementById("noResults");
+
+
+    let currentFilter = "all";
+
+
+    function filterCards() {
+
+        const search =
+            searchInput
+                .value
+                .toLowerCase()
+                .trim();
+
+
+        let visible = 0;
+
+
+        cards.forEach(card => {
+
+            const name =
+                card.dataset.name
+                    .toLowerCase();
+
+            const category =
+                card.dataset.category;
+
+
+            const matchesSearch =
+                name.includes(search);
+
+
+            const matchesFilter =
+                currentFilter === "all" ||
+                category === currentFilter;
+
+
+            if (
+                matchesSearch &&
+                matchesFilter
+            ) {
+
+                card.style.display =
+                    "";
+
+                visible++;
+
+            }
+
+            else {
+
+                card.style.display =
+                    "none";
+
+            }
+
+        });
+
+
+        if (visible === 0) {
+
+            noResults.classList.remove(
+                "hidden"
+            );
+
+        }
+
+        else {
+
+            noResults.classList.add(
+                "hidden"
+            );
+
+        }
+
+    }
+
+
+    searchInput.addEventListener(
+        "input",
+        filterCards
+    );
+
+
+
+    /* --------------------------------
+       CATEGORY FILTER
+    -------------------------------- */
+
+    document
+        .querySelectorAll(".filter-btn")
+        .forEach(button => {
+
+            button.addEventListener(
+                "click",
+                () => {
+
+                    document
+                        .querySelectorAll(
+                            ".filter-btn"
+                        )
+                        .forEach(btn => {
+
+                            btn.classList.remove(
+                                "active"
+                            );
+
+                        });
+
+
+                    button.classList.add(
+                        "active"
+                    );
+
+
+                    currentFilter =
+                        button.dataset.filter;
+
+
+                    filterCards();
+
+                }
+            );
+
+        });
+
+
+
+    /* --------------------------------
+       ESCAPE MODAL
+    -------------------------------- */
+
+    document.addEventListener(
+        "keydown",
+        event => {
+
+            if (
+                event.key === "Escape"
+            ) {
+
+                closePasscode();
+
+            }
+
+        }
+    );
+
+
+
+    /* --------------------------------
+       CLICK OUTSIDE MODAL
+    -------------------------------- */
+
+    document
+        .getElementById("passcodeModal")
+        .addEventListener(
+            "click",
+            event => {
+
+                if (
+                    event.target.id ===
+                    "passcodeModal"
+                ) {
+
+                    closePasscode();
+
+                }
+
+            }
+        );
+
+
+</script>
+
+</body>
+</html>
